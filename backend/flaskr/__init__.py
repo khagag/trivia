@@ -69,12 +69,16 @@ def create_app(test_config=None):
   '''
     @app.route('/questions')
     def get_question():
+        selection = Question.query.all()
+        ques = paginate_questions(request, selection)
+        if len(ques) == 0:
+            abort(404)
         return jsonify({
             'success': True,
             'categories': {i.id: i.type for i in Category.query.all()},
             'total_questions': len(Category.query.all()),
             'current_category': Category.query.first().format(),
-            "questions": [i.format() for i in Question.query.all()[1:11]]})
+            "questions": ques})
     '''
   TEST: At this point, when you start the application
   you should see questions and categories generated,
