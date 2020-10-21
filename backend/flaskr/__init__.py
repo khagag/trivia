@@ -227,7 +227,55 @@ def create_app(test_config=None):
   '''
     @app.route('/quizzes', methods=['POST'])
     def quiz():
-        return jsonify({'question': Question.query.first().format()})
+        data = request.get_json()
+        quess = Question.query.all()
+        previous = data.get('previous_questions')
+                # get the category
+        category = data.get('quiz_category')
+        # abort 400 if category or previous questions isn't found
+        if ((category is None) or (previous is None)):
+            abort(400)
+        ind = random.randint(1,len(quess))
+        quiz= quess[ind].format()
+        questions = []
+        if (category['id'] == 0):
+            questions = Question.query.all()
+        else:
+            questions = Question.query.filter_by(category=category['id']).all()
+            for q in previous:
+                if (q == question.id):
+                    used = True
+        def get_random_question():
+            return questions[random.randrange(0, len(questions), 1)]
+
+        # checks to see if question has already been used
+        def check_if_used(question):
+            used = False
+            for q in previous:
+                if (q == question.id):
+                    used = True
+
+            return used
+
+        # get random question
+        question = get_random_question()
+
+        # check if used, execute until unused question found
+        while (check_if_used(question)):
+            question = get_random_question()
+
+            # if all questions have been tried, return without question
+            # necessary if category has <5 questions
+            if (len(previous) == total):
+                return jsonify({
+                    'success': True
+                })
+
+        # return the question
+        return jsonify({
+            'success': True,
+            'question': question.format()
+        })
     '''
   @TODO:
   Create error handlers for all expected errors
