@@ -34,9 +34,12 @@ class TriviaTestCase(unittest.TestCase):
             self.db.create_all()
 
     def test_questions_get_api(self):
+        """ check getting the questions & categories """
         res = self.client().get('/questions')
+        # assert if the request status is successful
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
+        # assert the payload of the response
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
         self.assertTrue(len(data['categories']))
@@ -46,11 +49,11 @@ class TriviaTestCase(unittest.TestCase):
     def test_404_request_beyond_valid_page(self):
         """Tests question pagination failure 404"""
 
-        # send request with bad page data, load response
-        response = self.client().get('/questions?page=100')
+        # send request with not found page/questions
+        response = self.client().get('/questions?page=200')
         data = json.loads(response.data)
 
-        # check status code and message
+        # check status code and payload
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Not found')
@@ -59,36 +62,33 @@ class TriviaTestCase(unittest.TestCase):
         """Tests question deletion success"""
 
         # create a new question to be deleted
-        question = Question(question=self.new_question['question'], answer=self.new_question['answer'],
-                            category=self.new_question['category'], difficulty=self.new_question['difficulty'])
+        question = Question()
+        question.question = self.new_question['question']
+        question.answer = self.new_question['answer']
+        question.category = self.new_question['category']
+        question.difficulty = self.new_question['difficulty'])
         question.insert()
 
         # get the id of the new question
-        q_id = question.id
+        questionId = question.id
 
         # get number of questions before delete
-        questions_before = Question.query.all()
+        questions_before = len(Question.query.all())
 
         # delete the question and store response
         response = self.client().delete('/questions/{}'.format(q_id))
         data = json.loads(response.data)
 
         # get number of questions after delete
-        questions_after = Question.query.all()
+        questions_after = len(Question.query.all())
 
-        # see if the question has been deleted
-        question = Question.query.filter(Question.id == 1).one_or_none()
+        # assert if the question decreased / the question is deleted
+        self.assertEqual(questions_after,questions_before)
 
         # check status code and success message
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
-
-        # check if one less question after delete
-        self.assertTrue(len(questions_before) - len(questions_after) == 1)
-
-        # check if question equals None after delete
-        self.assertEqual(question, None)
 
 
     def tearDown(self):
