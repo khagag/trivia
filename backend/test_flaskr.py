@@ -58,15 +58,28 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Not found')
 
+    def test_422_request_beyond_valid_page(self):
+        """Tests question pagination failure 422"""
+
+        # send request with not found page/questions
+
+        response = self.client().post('/questions', json={})
+        data = json.loads(response.data)
+
+        # check status code and payload
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Unprocessed Entity')
+
     def test_delete_question(self):
         """Tests question deletion success"""
 
         # create a new question to be deleted
-        question = Question()
+        question = Question('','','','')
         question.question = self.new_question['question']
         question.answer = self.new_question['answer']
         question.category = self.new_question['category']
-        question.difficulty = self.new_question['difficulty'])
+        question.difficulty = self.new_question['difficulty']
         question.insert()
 
         # get the id of the new question
@@ -76,14 +89,14 @@ class TriviaTestCase(unittest.TestCase):
         questions_before = len(Question.query.all())
 
         # delete the question and store response
-        response = self.client().delete('/questions/{}'.format(q_id))
+        response = self.client().delete('/questions/{}'.format(questionId))
         data = json.loads(response.data)
 
         # get number of questions after delete
         questions_after = len(Question.query.all())
 
         # assert if the question decreased / the question is deleted
-        self.assertEqual(questions_after,questions_before)
+        self.assertEqual(questions_after+1,questions_before)
 
         # check status code and success message
         self.assertEqual(response.status_code, 200)
