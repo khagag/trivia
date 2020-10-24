@@ -54,6 +54,33 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_categories'])
         self.assertTrue(len(data['categories']))
 
+    def test_questions_create(self):
+        """ check creating new questions """
+
+        before = len(Question.query.all())
+        # create a new question to be deleted
+        question = Question('','','','')
+        question.question = self.new_question['question']
+        question.answer = self.new_question['answer']
+        question.category = self.new_question['category']
+        question.difficulty = self.new_question['difficulty']
+        question.insert()
+        after = len(Question.query.all())
+        # get the id of the new question
+        questionId = question.id
+
+        # delete the question and store response
+        response = self.client().get('/questions/{}'.format(questionId))
+        data = json.loads(response.data)
+
+        # check status code and success message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(before+1,after)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data.question , self.new_question['question'])
+        self.assertEqual(data.answer , self.new_question['answer'])
+        self.assertEqual(data.category , self.new_question['category'])
+        self.assertEqual(data.difficulty , self.new_question['difficulty'])
 
     def test_404_request_beyond_valid_page(self):
         """Tests question pagination failure 404"""
