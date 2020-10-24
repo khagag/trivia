@@ -44,6 +44,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']))
         self.assertTrue(len(data['categories']))
 
+    def test_categories_get_api(self):
+        """ check getting the categories """
+        res = self.client().get('/categories')
+        # assert if the request status is successful
+        self.assertEqual(res.status_code, 200)
+        data = json.loads(res.data)
+        # assert the payload of the response
+        self.assertTrue(data['total_categories'])
+        self.assertTrue(len(data['categories']))
 
 
     def test_404_request_beyond_valid_page(self):
