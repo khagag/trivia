@@ -35,14 +35,24 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_questions_get_api(self):
         """ check getting the questions & categories """
+        res = self.client().get('/questions?page=300')
+         # assert if the request status is successful
+        self.assertEqual(res.status_code, 404)
+        data = json.loads(res.data)
+        # assert the payload of the response
+        self.assertEqual(data['success'],False)
+
+    def test_questions_get_api_fail(self):
+
         res = self.client().get('/questions')
-        # assert if the request status is successful
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
         # assert the payload of the response
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
         self.assertTrue(len(data['categories']))
+
+
 
     def test_categories_get_api(self):
         """ check getting the categories """
