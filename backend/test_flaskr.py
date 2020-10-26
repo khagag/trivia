@@ -53,6 +53,37 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['categories']))
 
 
+    def test_search_questions_faliure(self):
+        """Tests search questions faliure"""
+
+        # send post request with search term
+        response = self.client().post('/questions',
+                                      json={'searchTerm': 'lljlks'})
+
+        # load response data
+        data = json.loads(response.data)
+
+        # check response status code and message
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+
+    def test_search_questions(self):
+        """Tests search questions success"""
+
+        # send post request with search term
+        response = self.client().post('/questions',
+                                      json={'searchTerm': 'cup'})
+
+        # load response data
+        data = json.loads(response.data)
+
+        # check response status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+        # check that number of results = 2
+        self.assertEqual(len(data['questions']), 2)
 
     def test_categories_get_api(self):
         """ check getting the categories """
