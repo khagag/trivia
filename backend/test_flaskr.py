@@ -95,14 +95,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_categories'])
         self.assertTrue(len(data['categories']))
 
-    def test_categories_get_api_faliure(self):
-        """ check getting the categories """
-        res = self.client().get('/categories?page=899')
-        # assert if the request status is successful
-        self.assertEqual(res.status_code, 404)
-        data = json.loads(res.data)
-        # assert the payload of the response
-        self.assertEqual(data['success'],False)
+    # def test_categories_get_api_faliure(self):
+    #     """ check getting the categories """
+    #     res = self.client().get('/categories?page=899')
+    #     # assert if the request status is successful
+    #     self.assertEqual(res.status_code, 404)
+    #     data = json.loads(res.data)
+    #     # assert the payload of the response
+    #     self.assertEqual(data['success'],False)
 
     def test_quizz_get(self):
         """ check getting the categories """
